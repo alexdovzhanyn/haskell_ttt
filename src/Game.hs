@@ -1,28 +1,49 @@
 module Game (
     GameState(..),
     BoardCoordinate(..),
+    Player(..),
+    Cell(..),
     initializeGameState,
     validateBoardCoordinate,
     updateBoardWithMove,
     checkGameFinished,
+    getPlayerChar,
+    getCellChar,
+    opponentOf,
     endGame
 ) where
 
-data GameState = GameState [[Char]]
+type GameState = [[Cell]]
 
 data BoardCoordinate = BoardCoordinate (Int, Int) deriving (Show)
 
+data Player = X | O deriving (Eq)
+
+data Cell = Token Player | Empty deriving (Eq)
+
+opponentOf :: Player -> Player
+opponentOf X = O
+opponentOf O = X
+
+getPlayerChar :: Player -> Char
+getPlayerChar X = 'X'
+getPlayerChar O = 'O'
+
+getCellChar :: Cell -> Char
+getCellChar Empty = ' '
+getCellChar (Token p) = getPlayerChar p
+
 initializeGameState :: GameState
-initializeGameState = GameState $ replicate 3 . replicate 3 $ ' '
+initializeGameState = replicate 3 . replicate 3 $ Empty
 
 validateBoardCoordinate :: BoardCoordinate -> GameState -> Bool
-validateBoardCoordinate (BoardCoordinate coordinate) (GameState gameState)
-    | (gameState !! fst coordinate) !! snd coordinate == ' ' = True
+validateBoardCoordinate (BoardCoordinate coordinate) gameState
+    | (gameState !! fst coordinate) !! snd coordinate == Empty = True
     | otherwise = False
 
-updateBoardWithMove :: GameState -> BoardCoordinate -> Char -> GameState
-updateBoardWithMove (GameState gameState) (BoardCoordinate (x, y)) playerChar  =
-    GameState updatedBoard
+updateBoardWithMove :: GameState -> BoardCoordinate -> Player -> GameState
+updateBoardWithMove gameState (BoardCoordinate (x, y)) player =
+    updatedBoard
     where
         updatedBoard = map updateRow (zip [0..] gameState)
 
@@ -31,18 +52,18 @@ updateBoardWithMove (GameState gameState) (BoardCoordinate (x, y)) playerChar  =
             | otherwise = row
 
         updateCol colIndex col
-            | colIndex == y = playerChar
+            | colIndex == y = Token player
             | otherwise = col
 
 checkGameFinished :: GameState -> Bool
-checkGameFinished (GameState gameState)
-        | any (all (== 'X')) gameState = True
-        | any (all (== 'O')) gameState = True
-        | any (all (== 'X')) (transpose gameState) = True
-        | any (all (== 'O')) (transpose gameState) = True
-        | any (all (== 'X')) crosses = True
-        | any (all (== 'O')) crosses = True
-        | all (all (/= ' ')) gameState = True
+checkGameFinished gameState
+        | any (all (== Token X)) gameState = True
+        | any (all (== Token O)) gameState = True
+        | any (all (== Token X)) (transpose gameState) = True
+        | any (all (== Token O)) (transpose gameState) = True
+        | any (all (== Token X)) crosses = True
+        | any (all (== Token O)) crosses = True
+        | all (all (/= Empty)) gameState = True
         | otherwise = False
     where
         transpose ([]:_) = []

@@ -8,15 +8,13 @@ main = do
     playerChar <- greetPlayer
     runGame initializeGameState playerChar 
 
-runGame :: GameState -> Char -> IO ()
-runGame gameState playerChar
+runGame :: GameState -> Player -> IO ()
+runGame gameState player
     | checkGameFinished gameState = do
         drawGameBoard gameState
         endGame
     | otherwise = do
         drawGameBoard gameState
-        move <- getPlayerMove gameState playerChar
+        move <- getPlayerMove gameState player
 
-        let nextPlayer = if playerChar == 'X' then 'O' else 'X'
-
-        runGame (updateBoardWithMove gameState move playerChar) nextPlayer
+        runGame (updateBoardWithMove gameState move player) (opponentOf player)
