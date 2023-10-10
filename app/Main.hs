@@ -15,6 +15,8 @@ runGame gameState playerChar
         endGame
     | otherwise = do
         drawGameBoard gameState
-        move <- getPlayerMove gameState
+        move <- getPlayerMove gameState playerChar
 
-        runGame (updateBoardWithMove gameState move playerChar) playerChar
+        let nextPlayer = if playerChar == 'X' then 'O' else 'X'
+
+        runGame (updateBoardWithMove gameState move playerChar) nextPlayer

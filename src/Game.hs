@@ -42,6 +42,7 @@ checkGameFinished (GameState gameState)
         | any (all (== 'O')) (transpose gameState) = True
         | any (all (== 'X')) crosses = True
         | any (all (== 'O')) crosses = True
+        | all (all (/= ' ')) gameState = True
         | otherwise = False
     where
         transpose ([]:_) = []

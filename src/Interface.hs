@@ -15,12 +15,12 @@ greetPlayer = do
     
     character <- getPlayerDesiredCharacter
 
-    putStrLn ("Okay, you'll be " ++ [character])
+    putStrLn ("Okay, you'll be " ++ [character] ++ ". Player 2 will be " ++ if character == 'X' then ['O'] else ['X'])
     return character
 
 getPlayerDesiredCharacter :: IO Char
 getPlayerDesiredCharacter = do
-    putStrLn "Do you want to be X or O?"
+    putStrLn "Player 1, do you want to be X or O?"
     userInput <- getLine
 
     -- Trim out whitespace, lowercase the input for easy matching later
@@ -43,22 +43,22 @@ drawGameBoard (GameState gameState) = do
 getBoardRow :: [Char] -> Int -> String
 getBoardRow [c1, c2, c3] idx = show idx ++ "  " ++ [c1] ++ " | " ++ [c2] ++ " | " ++ [c3]
 
-getPlayerMove :: GameState -> IO BoardCoordinate
-getPlayerMove gameState = do
-    putStrLn "Where would you like to place your token?"
+getPlayerMove :: GameState -> Char -> IO BoardCoordinate
+getPlayerMove gameState playerChar = do
+    putStrLn ("Player " ++ [playerChar] ++ ", where would you like to place your token?")
     userInput <- getLine
 
     coordinate <- case convertStringToCoordinate (map toLower userInput) of
             Just tokenCoordinate -> return tokenCoordinate
             Nothing -> do
                 putStrLn "\nThats not a valid token coordinate!"
-                getPlayerMove gameState
+                getPlayerMove gameState playerChar
 
     if validateBoardCoordinate coordinate gameState
     then return coordinate
     else do
         putStrLn "\nThere is already a token in that space!"
-        getPlayerMove gameState
+        getPlayerMove gameState playerChar
 
 convertStringToCoordinate :: String -> Maybe BoardCoordinate
 convertStringToCoordinate inputString
