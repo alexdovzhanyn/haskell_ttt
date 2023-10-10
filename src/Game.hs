@@ -40,10 +40,13 @@ checkGameFinished (GameState gameState)
         | any (all (== 'O')) gameState = True
         | any (all (== 'X')) (transpose gameState) = True
         | any (all (== 'O')) (transpose gameState) = True
+        | any (all (== 'X')) crosses = True
+        | any (all (== 'O')) crosses = True
         | otherwise = False
     where
         transpose ([]:_) = []
         transpose x = (map head x) : transpose (map tail x)
+        crosses = [[ (gameState !! 0) !! 0, (gameState !! 1) !! 1, (gameState !! 2) !! 2 ], [ (gameState !! 0) !! 2, (gameState !! 1) !! 1, (gameState !! 2) !! 0]]
 
 endGame :: IO ()
 endGame = putStrLn "Game Over."
